@@ -1,8 +1,8 @@
-FROM centos
+FROM ubuntu:latest
 
 LABEL maintainer="Eddy Park(xxxx@gmail.com)"
 
-RUN yum install -y iproute httpd
-RUN echo "hello, world" >> /var/www/html/index.html
+RUN apt-get update && apt-get install -y apache2
+RUN echo "TEST WEBPAGE" >> /var/www/html/index.html
 EXPOSE 80
-CMD ["/usr/sbin/httpd", "-DFOREGROUND"]
+CMD ["/usr/sbin/apache2ctl", "-DFOREGROUND"]
