@@ -1,6 +1,14 @@
 FROM debian
+MAINTAINER Eddy(eddy83y@gmail.com)
 
-RUN apit-get install -y fortune
+RUN mkdir /var/htdocs
+RUN apt-get update && apt-get install -y fortune
+
+WORKDIR 
 
 VOLUME /var/htdocs
-CMD 
+
+#COPY html-generator.sh /var/htdocs/html-generator.sh
+RUN ln -s /var/htdocs/html-generator.sh /entrypoint.sh
+#CMD ["/bin/bash", "html-generator.sh]
+ENTRYPOINT ["entrypoint.sh"]
