@@ -1,0 +1,57 @@
+docker run --name c1 -d stress
+docker run --cpu-shares 2048 --name c2 -d stress
+docker run --cpu-shares 512 --name c3 -d stress
+
+docker run -it --cpuset-cpus 0 ubuntu
+docker run -it --cpuset-cpus 0-3 ubuntu
+
+docker run --cpuset-cpus 0 --name c1 -d stress stress --cpu 1
+
+docker run -m 129m --memory-swap 129m --name c1 stress --vm 1 --vm-bytes 127m -t 5s
+docker run -m 129m --memory-swap 129m --name c2 stress:latest stress --vm 1 --vm-bytes 130m -t 5s
+docker run -m 129m --name c3 stress:latest stress --vm 1 --vm-bytes 130m -t 5s
+
+docker run --net bridge -it --name c1 --rm busybox
+
+docker network create -d macvlan   --subnet=10.0.10.0/24 --gateway=10.0.10.1 -o parent=ens3 my_macvlan
+docker run --network mynet --ip 192.100.100.20 --name c1 --rm -it busybox
+
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+
+import time
+import redis
+from flask import Flask
+
+app = Flask(__name__)
+cache = redis.Redis(host='redis',port=6379)
+
+def get_hit_count():
+    retries =5
+    while True:
+        try:
+            return cache.incr('hits')
+        except redis.exceptions.ConnectionError as exc:
+            if retries == 0:
+                raise exc
+            retries -= 1
+            time.sleep(0.5)
+
+@app.route('/')
+def hello():
+    count = get_hit_count()
+    return 'Hello World! I have been seen {} times.\n'.format(count)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", debug=True)
+
+Container안에서 다른 Container를 제어(생성/삭제) 하기 위한... 즉, docker명령어를 썼을 때, Host에서 쓰는 것과 같이 하게 하려고 volume mount를 한다.
+-v /var/run/docker.sock:/var/run/docker.sock
+
+docker run -d --name jenkins_prod --user root -v /var/run/docker.sock:/var/run/docker.sock -v jenkins-home-prod:/var/jenkins_home -p 8080:8080 -p 50000:50000 jenkins/jenkins:lts
+
+
+curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-18.09.8.tgz
+
+source <(kubectl completion bash)
+echo "source <(kubectl completion bash)" >> ~/.bashrc
+
